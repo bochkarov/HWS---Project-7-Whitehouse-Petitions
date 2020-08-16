@@ -53,16 +53,25 @@ class ViewController: UITableViewController {
     
     func showSearchAlertController() {
         
+        var filteredPetitions: [Petition] = []
         let searchAlertController = UIAlertController(title: "Filter", message: "", preferredStyle: .alert)
         
         searchAlertController.addTextField { (searchText) in
             searchText.placeholder = "Enter text"
-            let text = searchText.text
-            let filteredPetitions = petitions.filter($0.contains(text))
+        }
+        
+        func filterThePetitions(searchText: String) {
+            filteredPetitions = petitions.filter { petition in
+                return petition.title.contains(searchText)
+             }
         }
         
         let okayAction = UIAlertAction(title: "OK", style: .default) { (alert) in
-            let filteredPetitions = petitions.filter()
+            let textField = searchAlertController.textFields![0] as UITextField
+            filterThePetitions(searchText: textField.text!)
+            self.petitions = filteredPetitions
+            self.tableView.reloadData()
+//            print(filteredPetitions)
         }
 
    
