@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UITableViewController {
     var petitions = [Petition]()
+    var finalPetitions = [Petition]()
     
     
     override func viewDidLoad() {
@@ -42,6 +43,7 @@ class ViewController: UITableViewController {
         //        }
         //
         //        showError()
+        finalPetitions = petitions
     }
     
     
@@ -62,14 +64,19 @@ class ViewController: UITableViewController {
         
         func filterThePetitions(searchText: String) {
             filteredPetitions = petitions.filter { petition in
-                return petition.title.contains(searchText)
-             }
+               return petition.title.localizedCaseInsensitiveContains(searchText)
+            }
+            for petition in petitions {
+                if petition.body.localizedCaseInsensitiveContains(searchText){
+                filteredPetitions.append(petition)
+                }
+            }
         }
         
         let okayAction = UIAlertAction(title: "OK", style: .default) { (alert) in
             let textField = searchAlertController.textFields![0] as UITextField
             filterThePetitions(searchText: textField.text!)
-            self.petitions = filteredPetitions
+            self.finalPetitions = filteredPetitions
             self.tableView.reloadData()
 //            print(filteredPetitions)
         }
@@ -102,12 +109,12 @@ class ViewController: UITableViewController {
         showSearchAlertController()
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return petitions.count
+        return finalPetitions.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let petition = petitions[indexPath.row]
+        let petition = finalPetitions[indexPath.row]
         cell.textLabel?.text = petition.title
         cell.detailTextLabel?.text = petition.body
         return cell
@@ -115,7 +122,7 @@ class ViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = DetailViewController()
-        vc.detailItem = petitions[indexPath.row]
+        vc.detailItem = finalPetitions[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
     }
 }
